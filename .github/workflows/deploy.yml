@@ -1,0 +1,65 @@
+name: 构建并部署到 GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # 允许在 Actions 页面手动触发
+  workflow_dispatch:
+
+# GITHUB_TOKEN 需要这些权限才能发布 Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同时只跑一个部署;新的推送取消正在排队的旧任务(但不打断已开始的发布)
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 单元测试
+        run: npm test
+
+      - name: 构建
+        # 项目站点部署在 /<仓库名>/ 子路径下,base 必须与之一致,
+        # 否则 Service Worker 的 scope 会错,离线功能失效。
+        # vite.config.ts 默认用的是 /qwerty-mobile/,这里按实际仓库名覆盖,
+        # 这样改仓库名也不用改代码。
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/
+        run: npm run build
+
+      - name: 配置 Pages
+        uses: actions/configure-pages@v5
+
+      - name: 上传构建产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 发布到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,24 @@
+# 词库与音效是从上游原样复制的数据文件。
+# 必须禁用 Git 的行尾转换(-text),否则 Git 会把 LF 改写成 CRLF:
+#   1) 词库内容被改动,与 README 中「原样复制,未修改内容」的声明不符
+#   2) 每个文件体积变大,整个仓库多出几十 MB
+public/dicts/** -text
+public/sounds/** -text
+
+# LICENSE 需要保持与上游完全一致(GPL 要求附完整许可证原文)
+LICENSE -text
+
+# 生成的二进制资源
+*.png binary
+*.ico binary
+*.wav binary
+
+# 源码统一使用 LF
+*.ts   text eol=lf
+*.tsx  text eol=lf
+*.css  text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+*.mjs  text eol=lf
+*.yml  text eol=lf

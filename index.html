@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+
+    <!--
+      viewport 说明(移动端练习体验的关键):
+      - maximum-scale=1 + user-scalable=no:iOS 在聚焦字体较小的输入框时会自动放大页面,
+        这在打字练习里会导致页面乱跳,必须禁用
+      - viewport-fit=cover:让内容延伸到 iPhone 刘海/圆角区域,再用 safe-area 内边距避让
+      - interactive-widget=resizes-content:安卓 Chrome 上让键盘弹出时压缩视口而不是覆盖内容,
+        这样 visualViewport 的键盘避让逻辑才准确
+    -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+
+    <meta name="theme-color" content="#6366f1" />
+    <meta name="description" content="Qwerty Learner 移动端移植版 —— 在手机上做打字练习与单词默写" />
+
+    <!-- PWA 安装相关 -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Qwerty" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="color-scheme" content="light dark" />
+
+    <title>Qwerty Learner 手机版 — 打字练习与单词默写</title>
+
+    <!--
+      深色模式初始化。必须放在这里(而非 React 里)在首屏绘制前同步执行,
+      否则深色偏好用户会看到一瞬白屏闪烁。
+    -->
+    <script>
+      ;(function () {
+        try {
+          var saved = localStorage.getItem('qwerty-mobile:theme')
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+          if (saved === 'dark' || (saved !== 'light' && prefersDark)) {
+            document.documentElement.classList.add('dark')
+          }
+        } catch (e) {
+          /* localStorage 不可用时忽略,走浅色 */
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <div style="padding: 24px; font-family: system-ui">
+        需要启用 JavaScript 才能运行 Qwerty Learner。
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
